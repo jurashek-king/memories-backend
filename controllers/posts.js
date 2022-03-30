@@ -34,7 +34,7 @@ export const deletePost = async (req, res) => {
 export const updatePost = async (req, res) => {
   const postId = req.params.id;
   const postForUpdate = req.body;
-  
+
   try {
     const updatedPost = await postMessage.findByIdAndUpdate(
       postId,
@@ -44,5 +44,24 @@ export const updatePost = async (req, res) => {
     res.status(200).json(updatedPost);
   } catch {
     res.status(400).json({ message: error.message });
+  }
+};
+
+export const likePost = async (req, res) => {
+  const postId = req.params.id;
+  const authenticatedUser = req.userId;
+  if (!authenticatedUser) {
+    return res.status(401).json({message: 'Unauthorized access.'})
+  }
+  try {
+    const post = await postMessage.findById(postId);
+    const updatedPost = await postMessage.findByIdAndUpdate(
+      post._id, {likeCount: post.likeCount + 1},
+      { new: true }
+    );
+
+    res.status(200).json(updatedPost);
+  } catch (error) {
+    res.status(400).json({message: "ERROR LIKES"})
   }
 };
